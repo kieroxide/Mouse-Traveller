@@ -2,6 +2,7 @@ import pyautogui
 import time
 import socket
 import listeners
+import threading
 X = 0
 Y = 1
 
@@ -27,6 +28,7 @@ def main(conn):
         if(current_pos[X] <= 0):
             pyautogui.moveTo(midpoints[X], midpoints[Y])
         last_pos = current_pos
+        
         time.sleep(0.01)
 
 
@@ -41,5 +43,7 @@ if __name__ == "__main__":
         conn, addr = s.accept()
         with conn:
             print(f"Connected by {addr}")
-            listeners.start_mouse_listeners(conn)
+            listener_thread = threading.Thread(target=listeners.start_mouse_listeners, args=(conn,))
+            listener_thread.daemon = True
+            listener_thread.start()
             main(conn)
